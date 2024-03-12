@@ -103,6 +103,7 @@ router.get("/course/list", async (req, res) => {
     // if validation fails,throw error
     return res.status(400).send({ message: error.message });
   }
+  // calculate skip "(page-1)*limit"
   const skip = (validateData.page - 1) * validateData.limit;
   // find courses
   const courseList = await Course.aggregate([
