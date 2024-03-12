@@ -11,3 +11,8 @@ export const courseValidationSchema = Yup.object({
     .trim()
     .max(45, "Tutor name must be at max 45 characters."),
 });
+
+export const paginationDataValidationSchema = Yup.object({
+  page: Yup.number().positive().required().min(1, "Page must be at least 1"),
+  limit: Yup.number().default(6).min(1, "Limit must be at least 1."),
+});
