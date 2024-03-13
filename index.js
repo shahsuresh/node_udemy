@@ -1,6 +1,7 @@
 import express from "express";
 import connectDB from "./connect.db.js";
 import courseRoutes from "./course/course.route.js";
+import studentRoutes from "./student/student.route.js";
 
 const app = express();
 
@@ -12,6 +13,7 @@ connectDB();
 //? ====register routes====
 
 app.use(courseRoutes);
+app.use(studentRoutes);
 
 //?==== server and port=======
 const PORT = 8000;
