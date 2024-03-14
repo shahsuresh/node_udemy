@@ -2,6 +2,9 @@ import express from "express";
 import Student from "./student.model.js";
 import { addStudentValidationSchema } from "./student.validation.js";
 import { paginationDataValidationSchema } from "./student.validation.js";
+import mongoose from "mongoose";
+import { validateMongoIdFromParams } from "../middlewares/validateMongoId.js";
+import { validateStudentDataFromReqBody } from "./student.middleware.js";
 
 const router = express.Router();
 
@@ -121,4 +124,67 @@ router.get(
   }
 );
 
+//?===delete student=======
+
+router.delete(
+  "/student/delete/:id",
+  validateMongoIdFromParams,
+  async (req, res) => {
+    // extract studentId from req.params
+    const studentId = req.params.id;
+    // find student by ID
+    const requiredStudent = await Student.findOne({ _id: studentId });
+    // if student not found,throw error
+    if (!requiredStudent) {
+      return res.status(404).send({ message: "Student does not exist" });
+    }
+    // delete student
+
+    await Student.deleteOne({ _id: studentId });
+    // send response
+    return res.status(200).send({ message: "Student is deleted successfully" });
+  }
+);
+//?===get student details by ID====
+router.get(
+  "/student/details/:id",
+  validateMongoIdFromParams,
+  async (req, res) => {
+    //extract student id from req.params
+    const studentId = req.params.id;
+    // find student in db
+    const student = await Student.findOne({ _id: studentId });
+    //if student not found,throw error
+    if (!student) {
+      return res.status(404).send({ message: "Student doesn't exist" });
+    }
+    // send student as response
+    return res
+      .status(200)
+      .send({ message: "Success", studentDetails: student });
+  }
+);
+
+//? ===update student details ====
+router.put(
+  "/student/edit/:id",
+  validateMongoIdFromParams,
+  validateStudentDataFromReqBody,
+  async (req, res) => {
+    // extract id from req.params
+    const studentId = req.params.id;
+    // extract new values from req.body
+    const newValues = req.body;
+    //find student by ID
+    const student = await Student.findOne({ _id: studentId });
+    //if not student, throw error
+    if (!student) {
+      return res.status(400).send({ message: "Student doesn't exist" });
+    }
+    // update student details
+    await Student.updateOne({ _id: studentId }, { $set: { ...newValues } });
+    //send response
+    return res.status(200).send({ message: "Student is updated successfully" });
+  }
+);
 export default router;
